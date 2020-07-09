@@ -1,18 +1,29 @@
-[![Github Actions Status](https://github.com/hexlet-components/projects-frontend-l4-server/workflows/Node%20CI/badge.svg)](https://github.com/hexlet-components/projects-frontend-l4-server/actions)
+[![Maintainability](https://api.codeclimate.com/v1/badges/60f409c4ae541a0a7c53/maintainability)](https://codeclimate.com/github/mettled/frontend-project-lvl4/maintainability)
 
-### Requirements
+![progect-mini-slack](![Node CI](https://github.com/mettled/frontend-project-lvl4/workflows/Node%20CI/badge.svg)) 
 
-* [Heroku CLI](https://devcenter.heroku.com/articles/heroku-cli)
+## About app
 
-### Install
+RSS READER
+[https://progect-mini-slack.herokuapp.com](https://![Node CI](https://github.com/mettled/frontend-project-lvl4/workflows/Node%20CI/badge.svg).herokuapp.com)
 
-```sh
-$ make install
-```
-
-### Run
+## Setup
 
 ```sh
-$ make start
-# open http://localhost:5000
+make install
 ```
+
+## Run develop mode
+
+```sh
+make start-backend
+make start-frontend
+```
+
+## Run build
+
+```sh
+make build
+```
+
+All dependent modules will be download and install in the 'node_modules' folder
