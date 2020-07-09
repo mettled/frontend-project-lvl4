@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
-import routes from '../routes';
 import axios from 'axios';
+import routes from '../routes';
 
 const DEFAULT_CHANNEL = 1;
 
@@ -8,8 +8,8 @@ const addChannelAsync = createAsyncThunk(
   'channels/addChannel',
   async ({ channelName }) => {
     const url = routes.channelsPath();
-    await axios.post(url, { data: { attributes: { name: channelName } } }); 
-  }
+    await axios.post(url, { data: { attributes: { name: channelName } } });
+  },
 );
 
 const removeChannelAsync = createAsyncThunk(
@@ -17,25 +17,25 @@ const removeChannelAsync = createAsyncThunk(
   async ({ id }) => {
     const url = routes.channelPath(id);
     await axios.delete(url, { params: { id } });
-  }
+  },
 );
 
 const renameChannelAsync = createAsyncThunk(
   'channels/renameChannel',
   async ({ name, id }) => {
     const url = routes.channelPath(id);
-    const response = await axios.patch(url, { data: { attributes: { name, id } } });
-  }
+    await axios.patch(url, { data: { attributes: { name, id } } });
+  },
 );
 
 const chanelsSlice = createSlice({
   name: 'channels',
   initialState: [],
   reducers: {
-    addChannel: (state, { payload: { data } }) => [ ...state, data.attributes ],
+    addChannel: (state, { payload: { data } }) => [...state, data.attributes],
     removeChannel: (state, { payload }) => {
       const { id: idRemoveChannel } = payload.data;
-      return state.filter(({ id }) => id !== idRemoveChannel)
+      return state.filter(({ id }) => id !== idRemoveChannel);
     },
     renameChannel: (state, { payload }) => {
       const { name, id: currentChannelId } = payload.data.attributes;
@@ -57,7 +57,7 @@ const chanelsSlice = createSlice({
     },
     [renameChannelAsync.rejected]: (state, { error }) => {
       console.log(error);
-    }
+    },
   },
 });
 
@@ -66,11 +66,11 @@ const currentChannelSlice = createSlice({
   name: 'currentChannelId',
   initialState: null,
   reducers: {
-    changeCurrentChannel: (state, { payload }) =>  payload.id,
+    changeCurrentChannel: (state, { payload }) => payload.id,
   },
   extraReducers: {
     [chanelsSlice.actions.removeChannel]: () => DEFAULT_CHANNEL,
-  }
+  },
 });
 
 

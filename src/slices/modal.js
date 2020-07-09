@@ -4,12 +4,8 @@ const modalssSlice = createSlice({
   name: 'modal',
   initialState: null,
   reducers: {
-    showModal: (state, { payload }) => {
-      return payload;
-    },
-    hideModal: () => {
-      return null;
-    },
+    showModal: (state, { payload }) => payload,
+    hideModal: () => null,
   },
 });
 

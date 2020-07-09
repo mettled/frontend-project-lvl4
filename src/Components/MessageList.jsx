@@ -14,7 +14,7 @@ const MessageList = () => {
     <>
       {filteredMessages.map(({ id, message }) => <Message key={id} message={message} />)}
     </>
-  )
+  );
 };
 
 export default MessageList;

@@ -1,10 +1,10 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal, FormGroup, FormControl } from 'react-bootstrap';
+import { Modal, Form, Button } from 'react-bootstrap';
 import { useFormik } from 'formik';
 import { useDispatch } from 'react-redux';
+import { useTranslation } from 'react-i18next';
 import { addChannelAsync } from '../../slices/channels';
 import { hideModal } from '../../slices/modal';
-import { useTranslation } from "react-i18next";
 
 const AddChannel = () => {
   const inputRef = useRef();
@@ -16,9 +16,18 @@ const AddChannel = () => {
     onSubmit: async ({ channelName }, { setSubmitting, resetForm }) => {
       await dispatch(addChannelAsync({ channelName }));
       resetForm();
+      setSubmitting(false);
       dispatch(hideModal());
-    }, 
+    },
   });
+
+  const {
+    isSubmitting,
+    handleSubmit,
+    handleChange,
+    handleBlur,
+    values,
+  } = formik;
 
   useEffect(() => {
     inputRef.current.focus();
@@ -26,29 +35,33 @@ const AddChannel = () => {
 
   return (
     <>
-      <Modal show={true}  onHide={()=> dispatch(hideModal())}>
+      <Modal show onHide={() => dispatch(hideModal())}>
         <Modal.Header closeButton>
           <Modal.Title>{t('buttons.add')}</Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
-          <form onSubmit={formik.handleSubmit}>
-            <FormGroup>
-              <FormControl
+          <Form onSubmit={handleSubmit}>
+            <Form.Group>
+              <Form.Control
                 required
-                ref={inputRef}
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.channelName}
+                type="text"
                 name="channelName"
+                ref={inputRef}
+                onChange={handleChange}
+                onBlur={handleBlur}
+                value={values.channelName}
+                disabled={isSubmitting}
               />
-            </FormGroup>
-            <input type="submit" className="btn btn-primary" value={t('buttons.apply')} />
-          </form>
+            </Form.Group>
+            <Button variant="primary" type="submit" disabled={isSubmitting}>
+              {t('buttons.apply')}
+            </Button>
+          </Form>
         </Modal.Body>
       </Modal>
     </>
-  )
-}
+  );
+};
 
 export default AddChannel;

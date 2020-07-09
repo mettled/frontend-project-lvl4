@@ -4,10 +4,10 @@ import resources from './locales';
 
 export default () => (
   i18next
-  .use(initReactI18next)
-  .init({
-    lng: 'en',
-    debug: process.env.NODE_ENV !== 'production',
-    resources,
-  })
+    .use(initReactI18next)
+    .init({
+      lng: 'en',
+      debug: process.env.NODE_ENV !== 'production',
+      resources,
+    })
 );

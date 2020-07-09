@@ -3,7 +3,7 @@ import { formatDistanceToNow } from 'date-fns';
 
 const Message = ({ message }) => {
   const { text, data, name } = message;
-  
+
   return (
     <div className="pb-3">
       <strong>
