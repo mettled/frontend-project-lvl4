@@ -14,7 +14,7 @@ import UserContext from './context';
 export default (gon) => {
   const { channels, messages, currentChannelId } = gon;
   const userName = cookies.get('username') || faker.internet.userName();
-  cookies.set('username', userName, { expires: 7 });
+  cookies.set('username', userName, { expires: 10 });
 
   const store = configureStore({
     reducer: rootRedusers,

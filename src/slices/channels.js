@@ -39,13 +39,8 @@ const chanelsSlice = createSlice({
     },
     renameChannel: (state, { payload }) => {
       const { name, id: currentChannelId } = payload.data.attributes;
-      state.find(({ id }, index) => {
-        if (currentChannelId === id) {
-          state[index].name = name;
-          return true;
-        }
-        return false;
-      });
+      const channel = state.find(({ id }) => currentChannelId === id);
+      channel.name = name;
     },
   },
   extraReducers: {
