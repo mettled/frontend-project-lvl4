@@ -7,15 +7,16 @@ const DEFAULT_CHANNEL = 1;
 const addChannelAsync = createAsyncThunk(
   'channels/addChannel',
   async ({ channelName }) => {
-    const url = routes.channelsPath();
-    await axios.post(url, { data: { attributes: { name: channelName } } });
+    const url = routes.getChannelsPath();
+    const { data } = await axios.post(url, { data: { attributes: { name: channelName } } });
+    return data;
   },
 );
 
 const removeChannelAsync = createAsyncThunk(
   'channels/removeChannel',
   async ({ id }) => {
-    const url = routes.channelPath(id);
+    const url = routes.getChannelPath(id);
     await axios.delete(url, { params: { id } });
   },
 );
@@ -23,7 +24,7 @@ const removeChannelAsync = createAsyncThunk(
 const renameChannelAsync = createAsyncThunk(
   'channels/renameChannel',
   async ({ name, id }) => {
-    const url = routes.channelPath(id);
+    const url = routes.getChannelPath(id);
     await axios.patch(url, { data: { attributes: { name, id } } });
   },
 );
@@ -56,7 +57,6 @@ const chanelsSlice = createSlice({
   },
 });
 
-
 const currentChannelSlice = createSlice({
   name: 'currentChannelId',
   initialState: null,
@@ -64,6 +64,7 @@ const currentChannelSlice = createSlice({
     changeCurrentChannel: (state, { payload }) => payload.id,
   },
   extraReducers: {
+    [addChannelAsync.fulfilled]: (state, { payload: { data: { id } } }) => id,
     [chanelsSlice.actions.removeChannel]: () => DEFAULT_CHANNEL,
   },
 });

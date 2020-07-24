@@ -1,17 +1,24 @@
 import React from 'react';
-import { formatDistanceToNow } from 'date-fns';
+import { format } from 'date-fns';
+import cn from 'classnames';
 
-const Message = ({ message }) => {
+const Message = ({ message, classes }) => {
+  const className = cn(
+    { classes },
+    'pb-3',
+    'text-wrap',
+    'text-break',
+  );
+
   const { text, data, name } = message;
-
   return (
-    <div className="pb-3">
+    <div className={className}>
       <strong>
         {`${name} :`}
       </strong>
       <div>{ text }</div>
       <small className="text-info">
-        {formatDistanceToNow(new Date(data), { addSuffix: true })}
+        {format(new Date(data), 'yy/MMMM/dd HH:mm:ss')}
       </small>
     </div>
   );

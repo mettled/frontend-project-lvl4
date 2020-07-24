@@ -1,38 +1,32 @@
 import React, { useEffect, useRef } from 'react';
-import { Modal, Form, Button } from 'react-bootstrap';
-import { useFormik } from 'formik';
+import { Button } from 'react-bootstrap';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { renameChannelAsync } from '../../slices/channels';
 import { hideModal } from '../../slices/modal';
+import ModalTemplate from './helpers/ModalTemplate';
+import FormComponent from './helpers/FormComponent';
+import useValidateChannelName from './helpers/useValidateChannelName';
 
 const getNameChannel = ({ channels, currentChannelId }) => (
   channels.find(({ id }) => currentChannelId === id)
 );
 
+const getChannelsName = ({ channels }) => channels.map(({ name }) => name);
+
 const RenameChannel = () => {
   const { t } = useTranslation();
   const { id, name } = useSelector(getNameChannel);
-  const inputRef = useRef();
+  const channelsName = useSelector(getChannelsName);
+  const inputRef = useRef(null);
   const dispatch = useDispatch();
 
-  const formik = useFormik({
-    initialValues: { channelName: name },
-    onSubmit: async ({ channelName }, { setSubmitting, resetForm }) => {
-      await dispatch(renameChannelAsync({ id, name: channelName }));
-      resetForm();
-      setSubmitting(false);
-      dispatch(hideModal());
-    },
-  });
-
-  const {
-    isSubmitting,
-    handleSubmit,
-    handleChange,
-    handleBlur,
-    values,
-  } = formik;
+  const submit = async ({ value: channelName }, { setSubmitting, resetForm }) => {
+    await dispatch(renameChannelAsync({ id, name: channelName }));
+    resetForm();
+    setSubmitting(false);
+    dispatch(hideModal());
+  };
 
   useEffect(() => {
     inputRef.current.select();
@@ -40,31 +34,18 @@ const RenameChannel = () => {
 
   return (
     <>
-      <Modal show onHide={() => dispatch(hideModal())}>
-        <Modal.Header closeButton>
-          <Modal.Title>{t('buttons.rename')}</Modal.Title>
-        </Modal.Header>
-
-        <Modal.Body>
-          <Form onSubmit={handleSubmit}>
-            <Form.Group>
-              <Form.Control
-                required
-                type="text"
-                name="channelName"
-                ref={inputRef}
-                onChange={handleChange}
-                onBlur={handleBlur}
-                value={values.channelName}
-                disabled={isSubmitting}
-              />
-            </Form.Group>
-            <Button variant="primary" type="submit" disabled={isSubmitting}>
-              {t('buttons.apply')}
-            </Button>
-          </Form>
-        </Modal.Body>
-      </Modal>
+      <ModalTemplate title={t('buttons.rename')}>
+        <FormComponent
+          initialValue={name}
+          submit={submit}
+          validate={useValidateChannelName(channelsName)}
+          refProp={inputRef}
+        >
+          <Button variant="primary" type="submit">
+            {t('buttons.apply')}
+          </Button>
+        </FormComponent>
+      </ModalTemplate>
     </>
   );
 };

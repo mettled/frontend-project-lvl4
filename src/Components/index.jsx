@@ -5,7 +5,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import faker from 'faker';
 import io from 'socket.io-client';
 import cookies from 'js-cookie';
-import rootRedusers from '../slices';
+import rootReduser from '../slices';
 import App from './App';
 import { addChannel, removeChannel, renameChannel } from '../slices/channels';
 import { addMessage } from '../slices/messages';
@@ -17,7 +17,7 @@ export default (gon) => {
   cookies.set('username', userName, { expires: 10 });
 
   const store = configureStore({
-    reducer: rootRedusers,
+    reducer: rootReduser,
     preloadedState: {
       channels,
       currentChannelId,

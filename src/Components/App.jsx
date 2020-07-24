@@ -12,13 +12,11 @@ const App = () => (
       <div className="d-flex flex-column text-white bg-dark w-25">
         <Channels />
       </div>
-      <div className="d-flex flex-grow-1 flex-column justify-content-between">
+      <div className="d-flex flex-grow-1 flex-column justify-content-between w-75">
         <div className="d-flex justify-content-between align-items-center bg-light p-3">
           <Header />
         </div>
-        <div className="d-flex flex-column flex-grow-1 overflow-auto p-3">
-          <MessageList />
-        </div>
+        <MessageList classes="d-flex flex-column flex-grow-1 overflow-auto p-3" />
         <div className="p-3">
           <InputMessage />
         </div>
@@ -27,5 +25,6 @@ const App = () => (
     <Modals />
   </>
 );
+
 
 export default App;

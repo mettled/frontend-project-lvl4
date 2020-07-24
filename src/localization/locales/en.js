@@ -16,5 +16,11 @@ export default {
       enterMessage: 'Enter Message',
     },
     greatting: 'Hello',
+    errors: {
+      maxSymbol: 'MAX length {{length}} characters',
+      required: 'Required',
+      nospace: 'Needs at least one character, not just spaces',
+      noUniqChannelName: 'Enter a unique channel name',
+    },
   },
 };

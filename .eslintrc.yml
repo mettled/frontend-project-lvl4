@@ -13,8 +13,8 @@ env:
 
 settings:
   import/resolver:
-    - node
-    - webpack
+    node: {}
+    webpack: {}
 
 rules:
   import/extensions: 0
