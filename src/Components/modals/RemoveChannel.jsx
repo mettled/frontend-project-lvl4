@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { removeChannelAsync } from '../../slices/channels';
 import { hideModal } from '../../slices/modal';
-import ModalTemplate from './helpers/ModalTemplate';
+import ModalTemplate from '../helpers/ModalTemplate';
 
 const getCurrentChannel = (state) => state.currentChannelId;
 

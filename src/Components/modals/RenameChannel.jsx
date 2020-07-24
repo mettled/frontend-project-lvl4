@@ -4,9 +4,9 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { renameChannelAsync } from '../../slices/channels';
 import { hideModal } from '../../slices/modal';
-import ModalTemplate from './helpers/ModalTemplate';
-import FormComponent from './helpers/FormComponent';
-import useValidateChannelName from './helpers/useValidateChannelName';
+import ModalTemplate from '../helpers/ModalTemplate';
+import FormComponent from '../helpers/FormComponent';
+import useValidateChannelName from '../helpers/useValidateChannelName';
 
 const getNameChannel = ({ channels, currentChannelId }) => (
   channels.find(({ id }) => currentChannelId === id)

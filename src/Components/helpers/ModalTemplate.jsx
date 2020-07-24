@@ -2,7 +2,7 @@ import { Modal } from 'react-bootstrap';
 import cn from 'classnames';
 import React from 'react';
 import { useDispatch } from 'react-redux';
-import { hideModal } from '../../../slices/modal';
+import { hideModal } from '../../slices/modal';
 
 const ModalTemplate = ({ children, classes, title }) => {
   const dispatch = useDispatch();
