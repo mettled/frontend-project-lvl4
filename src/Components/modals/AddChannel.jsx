@@ -10,9 +10,20 @@ import useValidateChannelName from './helpers/useValidateChannelName';
 
 const getChannelsName = ({ channels }) => channels.map(({ name }) => name);
 
+const submit = () => {
+  const dispatch = useDispatch();
+  return (
+    async ({ value: channelName }, { setSubmitting, resetForm }) => {
+      await dispatch(addChannelAsync({ channelName }));
+      resetForm();
+      setSubmitting(false);
+      dispatch(hideModal());
+    }
+  );
+};
+
 const AddChannel = () => {
   const inputRef = useRef(null);
-  const dispatch = useDispatch();
   const { t } = useTranslation();
   const channelsName = useSelector(getChannelsName);
 
@@ -22,18 +33,11 @@ const AddChannel = () => {
     }
   });
 
-  const submit = async ({ value: channelName }, { setSubmitting, resetForm }) => {
-    await dispatch(addChannelAsync({ channelName }));
-    resetForm();
-    setSubmitting(false);
-    dispatch(hideModal());
-  };
-
   return (
     <>
       <ModalTemplate title={t('buttons.add')}>
         <FormComponent
-          submit={submit}
+          submit={submit()}
           validate={useValidateChannelName(channelsName)}
           refProp={inputRef}
         >

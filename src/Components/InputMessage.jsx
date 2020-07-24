@@ -7,10 +7,23 @@ import UserContext from './context';
 
 const getCurrentChannel = (state) => state.currentChannelId;
 
+const onSubmit = (userName, currentChannelId) => {
+  const dispatch = useDispatch();
+  return (
+    async ({ message }, { setSubmitting, resetForm }) => {
+      await dispatch(addMessagesAsync({
+        currentChannelId,
+        message: { text: message, name: userName, data: Date.now() },
+      }));
+      resetForm();
+      setSubmitting(false);
+    }
+  );
+};
+
 const InputMessage = () => {
   const { t } = useTranslation();
   const userName = useContext(UserContext);
-  const dispatch = useDispatch();
   const currentChannelId = useSelector(getCurrentChannel);
   const formikRef = useRef(null);
 
@@ -18,14 +31,7 @@ const InputMessage = () => {
     initialValues: {
       message: '',
     },
-    onSubmit: async ({ message }, { setSubmitting, resetForm }) => {
-      await dispatch(addMessagesAsync({
-        currentChannelId,
-        message: { text: message, name: userName, data: Date.now() },
-      }));
-      resetForm();
-      setSubmitting(false);
-    },
+    onSubmit: onSubmit(userName, currentChannelId),
   });
 
   const {

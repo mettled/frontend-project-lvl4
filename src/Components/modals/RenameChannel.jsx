@@ -12,6 +12,18 @@ const getNameChannel = ({ channels, currentChannelId }) => (
   channels.find(({ id }) => currentChannelId === id)
 );
 
+const submit = (id) => {
+  const dispatch = useDispatch();
+  return (
+    async ({ value: channelName }, { setSubmitting, resetForm }) => {
+      await dispatch(renameChannelAsync({ id, name: channelName }));
+      resetForm();
+      setSubmitting(false);
+      dispatch(hideModal());
+    }
+  );
+};
+
 const getChannelsName = ({ channels }) => channels.map(({ name }) => name);
 
 const RenameChannel = () => {
@@ -19,14 +31,7 @@ const RenameChannel = () => {
   const { id, name } = useSelector(getNameChannel);
   const channelsName = useSelector(getChannelsName);
   const inputRef = useRef(null);
-  const dispatch = useDispatch();
 
-  const submit = async ({ value: channelName }, { setSubmitting, resetForm }) => {
-    await dispatch(renameChannelAsync({ id, name: channelName }));
-    resetForm();
-    setSubmitting(false);
-    dispatch(hideModal());
-  };
 
   useEffect(() => {
     inputRef.current.select();
@@ -37,7 +42,7 @@ const RenameChannel = () => {
       <ModalTemplate title={t('buttons.rename')}>
         <FormComponent
           initialValue={name}
-          submit={submit}
+          submit={submit(id)}
           validate={useValidateChannelName(channelsName)}
           refProp={inputRef}
         >
