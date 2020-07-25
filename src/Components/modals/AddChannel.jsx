@@ -1,19 +1,19 @@
-import React, { useEffect, useRef } from 'react';
-import { Button } from 'react-bootstrap';
+import React, { useState, useEffect, useRef } from 'react';
+import { Overlay, Tooltip, Form, Button } from 'react-bootstrap';
+import { useFormik } from 'formik';
 import { useSelector, useDispatch } from 'react-redux';
 import { useTranslation } from 'react-i18next';
 import { addChannelAsync } from '../../slices/channels';
 import { hideModal } from '../../slices/modal';
-import FormComponent from '../helpers/FormComponent';
 import ModalTemplate from '../helpers/ModalTemplate';
-import useValidateChannelName from '../helpers/useValidateChannelName';
+import validateChannelName from '../helpers/validate';
 
 const getChannelsName = ({ channels }) => channels.map(({ name }) => name);
 
-const submit = () => {
+const onSubmit = () => {
   const dispatch = useDispatch();
   return (
-    async ({ value: channelName }, { setSubmitting, resetForm }) => {
+    async ({ channelName }, { setSubmitting, resetForm }) => {
       await dispatch(addChannelAsync({ channelName }));
       resetForm();
       setSubmitting(false);
@@ -26,6 +26,22 @@ const AddChannel = () => {
   const inputRef = useRef(null);
   const { t } = useTranslation();
   const channelsName = useSelector(getChannelsName);
+  const [show, setShow] = useState(false);
+
+  const {
+    isSubmitting,
+    handleSubmit,
+    handleChange,
+    handleBlur,
+    values,
+    errors,
+    setErrors,
+  } = useFormik({
+    initialValues: { channelName: '' },
+    validate: validateChannelName(channelsName),
+    onSubmit: onSubmit(),
+  });
+
 
   useEffect(() => {
     if (inputRef.current) {
@@ -33,18 +49,43 @@ const AddChannel = () => {
     }
   });
 
+
+  useEffect(() => {
+    if (errors.channelName) {
+      setShow(true);
+      setTimeout(() => {
+        setShow(false);
+        setErrors({ channelName: '' });
+      }, 5000);
+    } else {
+      setShow(false);
+    }
+  }, [errors]);
+
   return (
     <>
       <ModalTemplate title={t('buttons.add')}>
-        <FormComponent
-          submit={submit()}
-          validate={useValidateChannelName(channelsName)}
-          refProp={inputRef}
-        >
-          <Button variant="primary" type="submit">
+        <Form onSubmit={handleSubmit}>
+          <Form.Group>
+            <Form.Control
+              ref={inputRef}
+              type="text"
+              name="channelName"
+              onChange={handleChange}
+              onBlur={handleBlur}
+              value={values.channelName}
+              disabled={isSubmitting}
+            />
+          </Form.Group>
+          <Overlay target={inputRef.current} show={show}>
+            <Tooltip>
+              {errors.channelName}
+            </Tooltip>
+          </Overlay>
+          <Button variant="primary" type="submit" disabled={isSubmitting}>
             {t('buttons.apply')}
           </Button>
-        </FormComponent>
+        </Form>
       </ModalTemplate>
     </>
   );

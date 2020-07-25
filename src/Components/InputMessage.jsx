@@ -1,5 +1,6 @@
-import React, { useEffect, useRef, useContext } from 'react';
+import React, { useState, useEffect, useRef, useContext } from 'react';
 import { useFormik } from 'formik';
+import { Overlay, Tooltip, Col, Form, Button } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { addMessagesAsync } from '../slices/messages';
@@ -7,8 +8,9 @@ import UserContext from './context';
 
 const getCurrentChannel = (state) => state.currentChannelId;
 
-const onSubmit = (userName, currentChannelId) => {
+const onSubmit2 = (userName, currentChannelId) => {
   const dispatch = useDispatch();
+  console.log('START - input Message');
   return (
     async ({ message }, { setSubmitting, resetForm }) => {
       await dispatch(addMessagesAsync({
@@ -25,14 +27,8 @@ const InputMessage = () => {
   const { t } = useTranslation();
   const userName = useContext(UserContext);
   const currentChannelId = useSelector(getCurrentChannel);
-  const formikRef = useRef(null);
-
-  const formik = useFormik({
-    initialValues: {
-      message: '',
-    },
-    onSubmit: onSubmit(userName, currentChannelId),
-  });
+  const inputRef = useRef(null);
+  const [show, setShow] = useState(false);
 
   const {
     isSubmitting,
@@ -40,37 +36,59 @@ const InputMessage = () => {
     handleChange,
     handleBlur,
     values,
-  } = formik;
+    errors,
+    setErrors,
+  } = useFormik({
+    initialValues: { message: '' },
+    validate: ({ message }) => {
+      const faults = {};
+      if (!/\S/gi.test(message)) {
+        faults.message = t('errors.nospace');
+      }
+      return faults;
+    },
+    onSubmit: onSubmit2(userName, currentChannelId),
+  });
 
   useEffect(() => {
-    if (formikRef.current) {
-      formikRef.current.focus();
+    if (errors.message) {
+      setShow(true);
+      setTimeout(() => {
+        setShow(false);
+        setErrors({ message: '' });
+      }, 5000);
+    } else {
+      setShow(false);
     }
-  }, [null]);
+  }, [errors]);
 
   return (
-    <form className="form" onSubmit={handleSubmit}>
-      <div className="form-row align-items-center">
-        <div className="col-10">
-          <input
-            required
-            ref={formikRef}
+    <Form inline onSubmit={handleSubmit}>
+      <Col>
+        <Form.Group>
+          <Form.Control
+            ref={inputRef}
+            type="text"
             name="message"
             onChange={handleChange}
             onBlur={handleBlur}
             value={values.message}
-            className="form-control"
-            placeholder={t('placeholder.enterMessage')}
+            disabled={isSubmitting}
+            className="w-100"
           />
-        </div>
-
-        <div className="col-auto">
-          <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
-            {t('buttons.send')}
-          </button>
-        </div>
-      </div>
-    </form>
+        </Form.Group>
+      </Col>
+      <Col sm={2}>
+        <Overlay target={inputRef.current} show={show}>
+          <Tooltip>
+            {errors.message}
+          </Tooltip>
+        </Overlay>
+        <Button className="col-auto" variant="primary" type="submit" disabled={isSubmitting}>
+          {t('buttons.send')}
+        </Button>
+      </Col>
+    </Form>
   );
 };
 
