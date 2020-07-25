@@ -1,6 +1,17 @@
-import React, { useState, useEffect, useRef, useContext } from 'react';
+import React, {
+  useState,
+  useEffect,
+  useRef,
+  useContext,
+} from 'react';
 import { useFormik } from 'formik';
-import { Overlay, Tooltip, Col, Form, Button } from 'react-bootstrap';
+import {
+  Overlay,
+  Tooltip,
+  Col,
+  Form,
+  Button,
+} from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import { addMessagesAsync } from '../slices/messages';
@@ -8,9 +19,8 @@ import UserContext from './context';
 
 const getCurrentChannel = (state) => state.currentChannelId;
 
-const onSubmit2 = (userName, currentChannelId) => {
+const onSubmit = (userName, currentChannelId) => {
   const dispatch = useDispatch();
-  console.log('START - input Message');
   return (
     async ({ message }, { setSubmitting, resetForm }) => {
       await dispatch(addMessagesAsync({
@@ -30,15 +40,7 @@ const InputMessage = () => {
   const inputRef = useRef(null);
   const [show, setShow] = useState(false);
 
-  const {
-    isSubmitting,
-    handleSubmit,
-    handleChange,
-    handleBlur,
-    values,
-    errors,
-    setErrors,
-  } = useFormik({
+  const formik = useFormik({
     initialValues: { message: '' },
     validate: ({ message }) => {
       const faults = {};
@@ -47,44 +49,43 @@ const InputMessage = () => {
       }
       return faults;
     },
-    onSubmit: onSubmit2(userName, currentChannelId),
+    onSubmit: onSubmit(userName, currentChannelId),
   });
 
   useEffect(() => {
-    if (errors.message) {
+    if (formik.errors.message) {
       setShow(true);
-      setTimeout(() => {
-        setShow(false);
-        setErrors({ message: '' });
-      }, 5000);
-    } else {
-      setShow(false);
     }
-  }, [errors]);
+  }, [formik.errors]);
+
+  const resetOverlay = () => {
+    setShow(false);
+    formik.setErrors({ message: '' });
+  };
 
   return (
-    <Form inline onSubmit={handleSubmit}>
+    <Form inline onSubmit={formik.handleSubmit}>
       <Col>
         <Form.Group>
           <Form.Control
             ref={inputRef}
             type="text"
             name="message"
-            onChange={handleChange}
-            onBlur={handleBlur}
-            value={values.message}
-            disabled={isSubmitting}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            value={formik.values.message}
+            disabled={formik.isSubmitting}
             className="w-100"
           />
         </Form.Group>
       </Col>
       <Col sm={2}>
-        <Overlay target={inputRef.current} show={show}>
+        <Overlay placement="top" target={inputRef.current} show={show} onEntered={() => setTimeout(resetOverlay, 2000)}>
           <Tooltip>
-            {errors.message}
+            {formik.errors.message}
           </Tooltip>
         </Overlay>
-        <Button className="col-auto" variant="primary" type="submit" disabled={isSubmitting}>
+        <Button className="col-auto" variant="primary" type="submit" disabled={formik.isSubmitting || !formik.isValid}>
           {t('buttons.send')}
         </Button>
       </Col>
