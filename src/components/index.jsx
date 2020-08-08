@@ -8,8 +8,8 @@ import cookies from 'js-cookie';
 import rootReduser from '../slices';
 import App from './App';
 import { addChannel, removeChannel, renameChannel } from '../slices/channels';
-import { addMessage } from '../slices/messages';
-import UserContext from './context';
+import { sendMessage } from '../slices/messages';
+import UserContext from '../context';
 
 export default (gon) => {
   const { channels, messages, currentChannelId } = gon;
@@ -27,7 +27,7 @@ export default (gon) => {
 
   const socket = io();
   socket.on('connect', () => {
-    socket.on('newMessage', (data) => store.dispatch(addMessage(data)));
+    socket.on('newMessage', (data) => store.dispatch(sendMessage(data)));
     socket.on('renameChannel', (data) => store.dispatch(renameChannel(data)));
     socket.on('removeChannel', (data) => store.dispatch(removeChannel(data)));
     socket.on('newChannel', (data) => store.dispatch(addChannel(data)));

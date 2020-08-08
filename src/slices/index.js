@@ -1,10 +1,12 @@
 import { combineReducers } from 'redux';
 import channels from './channels';
+import currentChannelId from './currentChannelId';
 import messages from './messages';
 import modal from './modal';
 
 export default combineReducers({
-  ...channels,
+  channels,
+  currentChannelId,
   messages,
   modal,
 });

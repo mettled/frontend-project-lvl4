@@ -2,8 +2,8 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 import routes from '../routes';
 
-const addMessagesAsync = createAsyncThunk(
-  'messages/newMessages',
+const sendMessageFetch = createAsyncThunk(
+  'messages/sendMessages',
   async ({ currentChannelId, message }) => {
     const url = routes.getChannelMessagesPath(currentChannelId);
     await axios.post(url, { data: { attributes: { message } } });
@@ -14,19 +14,19 @@ const messagesSlice = createSlice({
   name: 'messages',
   initialState: [],
   reducers: {
-    addMessage(state, { payload }) {
+    sendMessage(state, { payload }) {
       const { attributes } = payload.data;
-      return [...state, attributes];
+      state.push(attributes);
     },
   },
   extraReducers: {
-    [addMessagesAsync.rejected]: (state, { error }) => {
-      console.log(error);
+    [sendMessageFetch.rejected]: (state, { error }) => {
+      throw error;
     },
   },
 });
 
-export const { addMessage } = messagesSlice.actions;
+const { sendMessage } = messagesSlice.actions;
 
-export { addMessagesAsync };
+export { sendMessageFetch, sendMessage };
 export default messagesSlice.reducer;

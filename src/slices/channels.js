@@ -1,10 +1,9 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import { remove } from 'lodash';
 import routes from '../routes';
 
-const DEFAULT_CHANNEL = 1;
-
-const addChannelAsync = createAsyncThunk(
+const addChannelFetch = createAsyncThunk(
   'channels/addChannel',
   async ({ channelName }) => {
     const url = routes.getChannelsPath();
@@ -13,7 +12,7 @@ const addChannelAsync = createAsyncThunk(
   },
 );
 
-const removeChannelAsync = createAsyncThunk(
+const removeChannelFetch = createAsyncThunk(
   'channels/removeChannel',
   async ({ id }) => {
     const url = routes.getChannelPath(id);
@@ -21,7 +20,7 @@ const removeChannelAsync = createAsyncThunk(
   },
 );
 
-const renameChannelAsync = createAsyncThunk(
+const renameChannelFetch = createAsyncThunk(
   'channels/renameChannel',
   async ({ name, id }) => {
     const url = routes.getChannelPath(id);
@@ -29,52 +28,44 @@ const renameChannelAsync = createAsyncThunk(
   },
 );
 
-const chanelsSlice = createSlice({
+const channelsSlice = createSlice({
   name: 'channels',
   initialState: [],
   reducers: {
-    addChannel: (state, { payload: { data } }) => [...state, data.attributes],
-    removeChannel: (state, { payload }) => {
-      const { id: idRemoveChannel } = payload.data;
-      return state.filter(({ id }) => id !== idRemoveChannel);
+    addChannel(state, { payload: { data } }) {
+      state.push(data.attributes);
     },
-    renameChannel: (state, { payload }) => {
+    removeChannel(state, { payload }) {
+      const { id: idRemoveChannel } = payload.data;
+      remove(state, ({ id }) => id === idRemoveChannel);
+    },
+    renameChannel(state, { payload }) {
       const { name, id: currentChannelId } = payload.data.attributes;
       const channel = state.find(({ id }) => currentChannelId === id);
       channel.name = name;
     },
   },
   extraReducers: {
-    [addChannelAsync.rejected]: (state, { error }) => {
-      console.log(error);
+    [addChannelFetch.rejected]: (state, { error }) => {
+      throw error;
     },
-    [removeChannelAsync.rejected]: (state, { error }) => {
-      console.log(error);
+    [removeChannelFetch.rejected]: (state, { error }) => {
+      throw error;
     },
-    [renameChannelAsync.rejected]: (state, { error }) => {
-      console.log(error);
+    [renameChannelFetch.rejected]: (state, { error }) => {
+      throw error;
     },
   },
 });
 
-const currentChannelSlice = createSlice({
-  name: 'currentChannelId',
-  initialState: null,
-  reducers: {
-    changeCurrentChannel: (state, { payload }) => payload.id,
-  },
-  extraReducers: {
-    [addChannelAsync.fulfilled]: (state, { payload: { data: { id } } }) => id,
-    [chanelsSlice.actions.removeChannel]: () => DEFAULT_CHANNEL,
-  },
-});
+const { removeChannel, addChannel, renameChannel } = channelsSlice.actions;
 
-
-export const { removeChannel, addChannel, renameChannel } = chanelsSlice.actions;
-export { addChannelAsync, removeChannelAsync, renameChannelAsync };
-export const { changeCurrentChannel } = currentChannelSlice.actions;
-
-export default ({
-  channels: chanelsSlice.reducer,
-  currentChannelId: currentChannelSlice.reducer,
-});
+export {
+  addChannelFetch,
+  removeChannelFetch,
+  renameChannelFetch,
+  removeChannel,
+  addChannel,
+  renameChannel,
+};
+export default channelsSlice.reducer;

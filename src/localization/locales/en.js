@@ -19,8 +19,9 @@ export default {
     errors: {
       maxSymbol: 'MAX length {{length}} characters',
       required: 'Required',
-      nospace: 'Needs at least one character, not just spaces',
+      nospace: 'Must not start with a space',
       noUniqChannelName: 'Enter a unique channel name',
+      connectionError: 'Check net connection',
     },
   },
 };

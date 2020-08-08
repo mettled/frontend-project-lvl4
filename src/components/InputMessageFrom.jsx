@@ -14,26 +14,34 @@ import {
 } from 'react-bootstrap';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
-import { addMessagesAsync } from '../slices/messages';
-import UserContext from './context';
+import * as Yup from 'yup';
+import { sendMessageFetch } from '../slices/messages';
+import UserContext from '../context';
 
 const getCurrentChannel = (state) => state.currentChannelId;
 
 const onSubmit = (userName, currentChannelId) => {
   const dispatch = useDispatch();
+  const { t } = useTranslation();
+
   return (
-    async ({ message }, { setSubmitting, resetForm }) => {
-      await dispatch(addMessagesAsync({
-        currentChannelId,
-        message: { text: message, name: userName, data: Date.now() },
-      }));
-      resetForm();
-      setSubmitting(false);
+    async ({ message }, { setSubmitting, resetForm, setFieldError }) => {
+      try {
+        await dispatch(sendMessageFetch({
+          currentChannelId,
+          message: { text: message, name: userName, data: Date.now() },
+        }));
+        resetForm();
+        setSubmitting(false);
+      } catch (e) {
+        setFieldError('message', t('errors.connectionError'));
+        throw e;
+      }
     }
   );
 };
 
-const InputMessage = () => {
+const InputMessageFrom = () => {
   const { t } = useTranslation();
   const userName = useContext(UserContext);
   const currentChannelId = useSelector(getCurrentChannel);
@@ -42,13 +50,11 @@ const InputMessage = () => {
 
   const formik = useFormik({
     initialValues: { message: '' },
-    validate: ({ message }) => {
-      const faults = {};
-      if (!/\S/gi.test(message)) {
-        faults.message = t('errors.nospace');
-      }
-      return faults;
-    },
+    validationSchema: Yup.object({
+      message: Yup.string()
+        .matches(/^\S/, t('errors.nospace'))
+        .required(t('errors.required')),
+    }),
     onSubmit: onSubmit(userName, currentChannelId),
   });
 
@@ -57,11 +63,6 @@ const InputMessage = () => {
       setShow(true);
     }
   }, [formik.errors]);
-
-  const resetOverlay = () => {
-    setShow(false);
-    formik.setErrors({ message: '' });
-  };
 
   return (
     <Form inline onSubmit={formik.handleSubmit}>
@@ -80,11 +81,12 @@ const InputMessage = () => {
         </Form.Group>
       </Col>
       <Col sm={2}>
-        <Overlay placement="top" target={inputRef.current} show={show} onEntered={() => setTimeout(resetOverlay, 2000)}>
-          <Tooltip>
-            {formik.errors.message}
-          </Tooltip>
-        </Overlay>
+        { formik.errors.message
+          ? (
+            <Overlay placement="top" target={inputRef.current} show={show}>
+              <Tooltip>{formik.errors.message}</Tooltip>
+            </Overlay>
+          ) : null }
         <Button className="col-auto" variant="primary" type="submit" disabled={formik.isSubmitting || !formik.isValid}>
           {t('buttons.send')}
         </Button>
@@ -93,4 +95,4 @@ const InputMessage = () => {
   );
 };
 
-export default InputMessage;
+export default InputMessageFrom;

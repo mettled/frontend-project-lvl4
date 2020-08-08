@@ -15,18 +15,20 @@ import { useTranslation } from 'react-i18next';
 
 const ControlChannelForm = (props) => {
   const {
+    nameField = 'defaultField',
     initialValue = '',
     onSubmit,
-    validate,
+    validation,
     effectAction = 'focus',
   } = props;
+
   const inputRef = useRef(null);
   const { t } = useTranslation();
   const [show, setShow] = useState(false);
 
   const formik = useFormik({
-    initialValues: { channelName: initialValue },
-    validate,
+    initialValues: { [nameField]: initialValue },
+    validationSchema: validation,
     onSubmit,
   });
 
@@ -37,15 +39,10 @@ const ControlChannelForm = (props) => {
   }, []);
 
   useEffect(() => {
-    if (formik.errors.channelName) {
+    if (formik.errors[nameField]) {
       setShow(true);
     }
   }, [formik.errors]);
-
-  const resetOverlay = () => {
-    setShow(false);
-    formik.setErrors({ message: '' });
-  };
 
   return (
     <>
@@ -54,18 +51,19 @@ const ControlChannelForm = (props) => {
           <Form.Control
             ref={inputRef}
             type="text"
-            name="channelName"
+            name={nameField}
             onChange={formik.handleChange}
             onBlur={formik.handleBlur}
-            value={formik.values.channelName}
+            value={formik.values[nameField]}
             disabled={formik.isSubmitting}
           />
         </Form.Group>
-        <Overlay placement="right" target={inputRef.current} show={show} onEntered={() => setTimeout(resetOverlay, 2000)}>
-          <Tooltip>
-            {formik.errors.channelName}
-          </Tooltip>
-        </Overlay>
+        { formik.errors[nameField]
+          ? (
+            <Overlay placement="top" target={inputRef.current} show={show}>
+              <Tooltip>{formik.errors[nameField]}</Tooltip>
+            </Overlay>
+          ) : null }
         <Button variant="primary" type="submit" disabled={formik.isSubmitting || !formik.isValid}>
           {t('buttons.apply')}
         </Button>
