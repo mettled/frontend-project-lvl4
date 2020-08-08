@@ -1,5 +1,5 @@
 import { createSlice } from '@reduxjs/toolkit';
-import { removeChannel, addChannelFetch } from './channels';
+import { removeChannel, addChannel } from './channels';
 
 const DEFAULT_ID = 1;
 
@@ -10,7 +10,7 @@ const currentChannelSlice = createSlice({
     changeCurrentChannel: (state, { payload }) => payload.id,
   },
   extraReducers: {
-    [addChannelFetch.fulfilled]: (state, { payload: { data: { id } } }) => id,
+    [addChannel]: (state, { payload: { data: { id } } }) => id,
     [removeChannel]: () => DEFAULT_ID,
   },
 });

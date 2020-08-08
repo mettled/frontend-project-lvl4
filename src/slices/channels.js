@@ -7,7 +7,8 @@ const addChannelFetch = createAsyncThunk(
   'channels/addChannel',
   async ({ channelName }) => {
     const url = routes.getChannelsPath();
-    await axios.post(url, { data: { attributes: { name: channelName } } });
+    const { data } = await axios.post(url, { data: { attributes: { name: channelName } } });
+    return data;
   },
 );
 
