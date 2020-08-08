@@ -17,7 +17,6 @@ const RemoveChannel = () => {
   const currentChannelId = useSelector(getCurrentChannel);
   const [errors, setErrors] = useState(null);
   const [show, setShow] = useState(false);
-
   const dispatch = useDispatch();
   const inputRef = useRef(null);
 

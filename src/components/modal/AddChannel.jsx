@@ -30,7 +30,6 @@ const AddChannel = () => {
   const { t } = useTranslation();
   const dispatch = useDispatch();
   const channelsName = useSelector(getChannelsName);
-
   const validation = Yup.object({
     channelName: Yup.string()
       .matches(/^\S/, t('errors.nospace'))
