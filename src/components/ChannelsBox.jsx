@@ -2,29 +2,25 @@ import React, { useContext } from 'react';
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import cn from 'classnames';
-import { changeCurrentChannel } from '../slices/currentChannelId';
-import { showModal } from '../slices/modal';
+import { actions } from '../slices';
 import UserContext from '../context';
 
-const getChannels = (state) => state.channels;
-const getCurrentChannel = (state) => state.currentChannelId;
+const getChannelsInfo = ({ channels, currentChannelId }) => ({ channels, currentChannelId });
 
 const ChannelsBox = () => {
   const dispatch = useDispatch();
-  const channels = useSelector(getChannels);
-  const currentChannelId = useSelector(getCurrentChannel);
+  const { channels, currentChannelId } = useSelector(getChannelsInfo);
   const userName = useContext(UserContext);
   const { t } = useTranslation();
 
-  const handleChangeChannel = (id) => (e) => {
-    e.preventDefault();
-    dispatch(changeCurrentChannel({ id }));
+  const handleChangeChannel = (id) => () => {
+    dispatch(actions.changeCurrentChannel({ id }));
   };
 
   return (
     <>
       <div className="p-3">
-        {`${t('greatting')}: ${userName}`}
+        {`${t('greeting')}: ${userName}`}
       </div>
       <hr />
       {
@@ -36,7 +32,7 @@ const ChannelsBox = () => {
           return <button type="button" className={classes} key={id} onClick={handleChangeChannel(id)}>{`# ${name}`}</button>;
         })
       }
-      <button type="button" className="btn btn-primary mt-3" onClick={() => dispatch(showModal('addChannel'))}>{t('buttons.addChannel')}</button>
+      <button type="button" className="btn btn-primary mt-3" onClick={() => dispatch(actions.showModal('addChannel'))}>{t('buttons.addChannel')}</button>
     </>
   );
 };

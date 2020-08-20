@@ -5,10 +5,8 @@ import { configureStore } from '@reduxjs/toolkit';
 import faker from 'faker';
 import io from 'socket.io-client';
 import cookies from 'js-cookie';
-import rootReduser from '../slices';
+import rootReduser, { actions } from '../slices';
 import App from './App';
-import { addChannel, removeChannel, renameChannel } from '../slices/channels';
-import { sendMessage } from '../slices/messages';
 import UserContext from '../context';
 
 export default (gon) => {
@@ -27,10 +25,10 @@ export default (gon) => {
 
   const socket = io();
   socket.on('connect', () => {
-    socket.on('newMessage', (data) => store.dispatch(sendMessage(data)));
-    socket.on('renameChannel', (data) => store.dispatch(renameChannel(data)));
-    socket.on('removeChannel', (data) => store.dispatch(removeChannel(data)));
-    socket.on('newChannel', (data) => store.dispatch(addChannel(data)));
+    socket.on('newMessage', (data) => store.dispatch(actions.newMessage(data)));
+    socket.on('renameChannel', (data) => store.dispatch(actions.renameChannel(data)));
+    socket.on('removeChannel', (data) => store.dispatch(actions.removeChannel(data)));
+    socket.on('newChannel', (data) => store.dispatch(actions.addChannel(data)));
   });
 
   ReactDOM.render(

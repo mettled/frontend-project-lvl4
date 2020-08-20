@@ -15,7 +15,7 @@ export default {
     placeholder: {
       enterMessage: 'Enter Message',
     },
-    greatting: 'Hello',
+    greeting: 'Hello',
     errors: {
       maxSymbol: 'MAX length {{length}} characters',
       required: 'Required',

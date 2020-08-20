@@ -15,21 +15,21 @@ import {
 import { useTranslation } from 'react-i18next';
 import { useSelector, useDispatch } from 'react-redux';
 import * as Yup from 'yup';
-import { sendMessageFetch } from '../slices/messages';
+import { actions } from '../slices';
 import UserContext from '../context';
 
 const getCurrentChannel = (state) => state.currentChannelId;
 
-const onSubmit = (userName, currentChannelId) => {
+const useSubmit = (userName, currentChannelId) => {
   const dispatch = useDispatch();
   const { t } = useTranslation();
 
   return (
     async ({ message }, { setSubmitting, resetForm, setFieldError }) => {
       try {
-        await dispatch(sendMessageFetch({
+        await dispatch(actions.postMessage({
           currentChannelId,
-          message: { text: message, name: userName, data: Date.now() },
+          message: { text: message, name: userName, date: Date.now() },
         }));
         resetForm();
         setSubmitting(false);
@@ -41,12 +41,12 @@ const onSubmit = (userName, currentChannelId) => {
   );
 };
 
-const InputMessageFrom = () => {
+const InputMessageForm = () => {
   const { t } = useTranslation();
   const userName = useContext(UserContext);
   const currentChannelId = useSelector(getCurrentChannel);
   const inputRef = useRef(null);
-  const [show, setShow] = useState(false);
+  const [show, setShowError] = useState(false);
 
   const formik = useFormik({
     initialValues: { message: '' },
@@ -55,12 +55,18 @@ const InputMessageFrom = () => {
         .matches(/^\S/, t('errors.nospace'))
         .required(t('errors.required')),
     }),
-    onSubmit: onSubmit(userName, currentChannelId),
+    onSubmit: useSubmit(userName, currentChannelId),
   });
 
   useEffect(() => {
+    if (inputRef.current) {
+      inputRef.current.focus();
+    }
+  }, []);
+
+  useEffect(() => {
     if (formik.errors.message) {
-      setShow(true);
+      setShowError(true);
     }
   }, [formik.errors]);
 
@@ -81,12 +87,14 @@ const InputMessageFrom = () => {
         </Form.Group>
       </Col>
       <Col sm={2}>
-        { formik.errors.message
-          ? (
+        {
+          formik.errors.message
+          && (
             <Overlay placement="top" target={inputRef.current} show={show}>
               <Tooltip>{formik.errors.message}</Tooltip>
             </Overlay>
-          ) : null }
+          )
+        }
         <Button className="col-auto" variant="primary" type="submit" disabled={formik.isSubmitting || !formik.isValid}>
           {t('buttons.send')}
         </Button>
@@ -95,4 +103,4 @@ const InputMessageFrom = () => {
   );
 };
 
-export default InputMessageFrom;
+export default InputMessageForm;

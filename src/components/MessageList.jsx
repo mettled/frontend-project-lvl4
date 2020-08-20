@@ -14,6 +14,7 @@ const MessageList = ({ classes }) => {
 
   const className = cn({
     [classes]: true,
+    'd-flex flex-column flex-grow-1 overflow-auto p-3': true,
   });
 
   useEffect(() => {

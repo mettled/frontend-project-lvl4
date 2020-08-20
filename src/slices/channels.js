@@ -3,8 +3,8 @@ import axios from 'axios';
 import { remove } from 'lodash';
 import routes from '../routes';
 
-const addChannelFetch = createAsyncThunk(
-  'channels/addChannel',
+const postChannel = createAsyncThunk(
+  'channels/postChannel',
   async ({ channelName }) => {
     const url = routes.getChannelsPath();
     const { data } = await axios.post(url, { data: { attributes: { name: channelName } } });
@@ -12,16 +12,16 @@ const addChannelFetch = createAsyncThunk(
   },
 );
 
-const removeChannelFetch = createAsyncThunk(
-  'channels/removeChannel',
+const deleteChannel = createAsyncThunk(
+  'channels/deleteChannel',
   async ({ id }) => {
     const url = routes.getChannelPath(id);
     await axios.delete(url, { params: { id } });
   },
 );
 
-const renameChannelFetch = createAsyncThunk(
-  'channels/renameChannel',
+const patchChannel = createAsyncThunk(
+  'channels/patchChannel',
   async ({ name, id }) => {
     const url = routes.getChannelPath(id);
     await axios.patch(url, { data: { attributes: { name, id } } });
@@ -36,8 +36,8 @@ const channelsSlice = createSlice({
       state.push(data.attributes);
     },
     removeChannel(state, { payload }) {
-      const { id: idRemoveChannel } = payload.data;
-      remove(state, ({ id }) => id === idRemoveChannel);
+      const { id: removedChannelId } = payload.data;
+      remove(state, ({ id }) => id === removedChannelId);
     },
     renameChannel(state, { payload }) {
       const { name, id: currentChannelId } = payload.data.attributes;
@@ -45,27 +45,12 @@ const channelsSlice = createSlice({
       channel.name = name;
     },
   },
-  extraReducers: {
-    [addChannelFetch.rejected]: (state, { error }) => {
-      throw error;
-    },
-    [removeChannelFetch.rejected]: (state, { error }) => {
-      throw error;
-    },
-    [renameChannelFetch.rejected]: (state, { error }) => {
-      throw error;
-    },
-  },
 });
 
-const { removeChannel, addChannel, renameChannel } = channelsSlice.actions;
-
-export {
-  addChannelFetch,
-  removeChannelFetch,
-  renameChannelFetch,
-  removeChannel,
-  addChannel,
-  renameChannel,
+export const actions = {
+  ...channelsSlice.actions,
+  postChannel,
+  deleteChannel,
+  patchChannel,
 };
 export default channelsSlice.reducer;

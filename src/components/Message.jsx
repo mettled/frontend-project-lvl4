@@ -10,15 +10,15 @@ const Message = ({ message, classes }) => {
     'text-break',
   );
 
-  const { text, data, name } = message;
+  const { text, date, name } = message;
   return (
     <div className={className}>
-      <strong>
+      <span className="font-weight-bold">
         {`${name} :`}
-      </strong>
+      </span>
       <div>{ text }</div>
       <small className="text-info">
-        {format(new Date(data), 'yy/MMMM/dd HH:mm:ss')}
+        {format(new Date(date), 'yy/MMMM/dd HH:mm:ss')}
       </small>
     </div>
   );

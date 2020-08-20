@@ -1,7 +1,7 @@
 import React from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useTranslation } from 'react-i18next';
-import { showModal } from '../slices/modal';
+import { actions } from '../slices';
 
 const getNameChannel = ({ channels, currentChannelId }) => (
   channels.find(({ id }) => currentChannelId === id)
@@ -19,12 +19,12 @@ const Header = () => {
       </div>
       {
         removable
-          ? (
-            <div>
-              <button type="button" className="btn btn-danger mr-3" onClick={() => dispatch(showModal('removeChannel'))}>{t('buttons.removeChannel')}</button>
-              <button type="button" className="btn btn-primary" onClick={() => dispatch(showModal('renameChannel'))}>{t('buttons.renameChannel')}</button>
-            </div>
-          ) : null
+        && (
+          <div>
+            <button type="button" className="btn btn-danger mr-3" onClick={() => dispatch(actions.showModal('removeChannel'))}>{t('buttons.removeChannel')}</button>
+            <button type="button" className="btn btn-primary" onClick={() => dispatch(actions.showModal('renameChannel'))}>{t('buttons.renameChannel')}</button>
+          </div>
+        )
       }
     </>
   );
