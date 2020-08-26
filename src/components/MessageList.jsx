@@ -1,4 +1,4 @@
-import React, { useRef, useEffect } from 'react';
+import React, { useRef } from 'react';
 import { useSelector } from 'react-redux';
 import Message from './Message';
 
@@ -11,18 +11,9 @@ const MessageList = () => {
   const filteredMessages = messages.filter(({ channelId }) => channelId === currentChannelId);
   const inputRef = useRef(null);
 
-  useEffect(() => {
-    if (inputRef.current) {
-      inputRef.current.scrollTo({
-        top: inputRef.current.scrollHeight,
-        behavior: 'auto',
-      });
-    }
-  });
-
   return (
-    <div ref={inputRef} className="d-flex flex-column flex-grow-1 overflow-auto p-3">
-      {filteredMessages.map(({ id, message }) => <Message key={id} message={message} />)}
+    <div ref={inputRef} className="d-flex flex-column-reverse flex-grow-1 overflow-auto p-3">
+      {filteredMessages.reverse().map(({ id, message }) => <Message key={id} message={message} />)}
     </div>
   );
 };
