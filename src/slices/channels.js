@@ -7,8 +7,12 @@ const postChannel = createAsyncThunk(
   'channels/postChannel',
   async ({ channelName }) => {
     const url = routes.getChannelsPath();
-    const { data } = await axios.post(url, { data: { attributes: { name: channelName } } });
-    return data;
+    try {
+      const { data } = await axios.post(url, { data: { attributes: { name: channelName } } });
+      return { data };
+    } catch (e) {
+      return { error: e.message };
+    }
   },
 );
 
@@ -16,15 +20,25 @@ const deleteChannel = createAsyncThunk(
   'channels/deleteChannel',
   async ({ id }) => {
     const url = routes.getChannelPath(id);
-    await axios.delete(url, { params: { id } });
+    try {
+      const { data } = await axios.delete(url, { params: { id } });
+      return { data };
+    } catch (e) {
+      return { error: e.message };
+    }
   },
 );
 
-const patchChannel = createAsyncThunk(
-  'channels/patchChannel',
+const updateChannelName = createAsyncThunk(
+  'channels/updateChannelName',
   async ({ name, id }) => {
     const url = routes.getChannelPath(id);
-    await axios.patch(url, { data: { attributes: { name, id } } });
+    try {
+      const { data } = await axios.patch(url, { data: { attributes: { name, id } } });
+      return { data };
+    } catch (e) {
+      return { error: e.message };
+    }
   },
 );
 
@@ -51,6 +65,6 @@ export const actions = {
   ...channelsSlice.actions,
   postChannel,
   deleteChannel,
-  patchChannel,
+  updateChannelName,
 };
 export default channelsSlice.reducer;

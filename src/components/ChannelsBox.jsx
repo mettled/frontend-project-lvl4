@@ -18,6 +18,10 @@ const ChannelsBox = () => {
     dispatch(actions.changeCurrentChannel({ id }));
   };
 
+  const handleShowModal = () => {
+    dispatch(actions.showModal('addChannel'));
+  };
+
   useEffect(() => {
     if (inputRef.current) {
       inputRef.current.scrollTo({
@@ -36,15 +40,15 @@ const ChannelsBox = () => {
       <div ref={inputRef} className="d-flex flex-column overflow-auto">
         {
           channels.map(({ id, name }) => {
-            const classes = cn('btn', {
-              'btn-light active': currentChannelId === id,
-              'btn-link text-white': currentChannelId !== id,
-            });
+            const classes = cn(
+              'btn',
+              currentChannelId === id ? 'btn-light active' : 'btn-link text-white',
+            );
             return <button type="button" className={classes} key={id} onClick={handleChangeChannel(id)}>{`# ${name}`}</button>;
           })
         }
       </div>
-      <button type="button" className="btn btn-primary mt-3" onClick={() => dispatch(actions.showModal('addChannel'))}>{t('buttons.addChannel')}</button>
+      <button type="button" className="btn btn-primary mt-3" onClick={handleShowModal}>{t('buttons.addChannel')}</button>
     </>
   );
 };

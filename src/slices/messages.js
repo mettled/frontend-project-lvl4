@@ -6,7 +6,12 @@ const postMessage = createAsyncThunk(
   'messages/postMessage',
   async ({ currentChannelId, message }) => {
     const url = routes.getChannelMessagesPath(currentChannelId);
-    await axios.post(url, { data: { attributes: { message } } });
+    try {
+      const { data } = await axios.post(url, { data: { attributes: { message } } });
+      return { data };
+    } catch (e) {
+      return { error: e.message };
+    }
   },
 );
 
@@ -14,7 +19,7 @@ const messagesSlice = createSlice({
   name: 'messages',
   initialState: [],
   reducers: {
-    newMessage(state, { payload }) {
+    getNewMessage(state, { payload }) {
       const { attributes } = payload.data;
       state.push(attributes);
     },

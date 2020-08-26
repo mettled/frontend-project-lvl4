@@ -1,8 +1,6 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import {
   Modal,
-  Overlay,
-  Tooltip,
   Button,
 } from 'react-bootstrap';
 import { useSelector, useDispatch } from 'react-redux';
@@ -15,26 +13,18 @@ const RemoveChannel = () => {
   const { t } = useTranslation();
   const currentChannelId = useSelector(getCurrentChannel);
   const [errors, setErrors] = useState(null);
-  const [show, setShowError] = useState(false);
   const dispatch = useDispatch();
   const inputRef = useRef(null);
 
   const handlerRemove = () => async () => {
-    try {
-      await dispatch(actions.deleteChannel({ id: currentChannelId }));
-      dispatch(actions.hideModal());
-      setErrors(null);
-    } catch (e) {
+    const { payload: { error } } = await dispatch(actions.deleteChannel({ id: currentChannelId }));
+    if (error) {
       setErrors(t('errors.connectionError'));
-      throw e;
+      return;
     }
+    setErrors(null);
+    dispatch(actions.hideModal());
   };
-
-  useEffect(() => {
-    if (errors) {
-      setShowError(true);
-    }
-  }, [errors]);
 
   return (
     <>
@@ -46,13 +36,8 @@ const RemoveChannel = () => {
           <Button onClick={handlerRemove()} variant="success" size="lg">{t('buttons.yes')}</Button>
           <Button onClick={() => dispatch(actions.hideModal())} variant="danger" size="lg">{t('buttons.no')}</Button>
         </Modal.Body>
+        {errors && <div className="ml-5 px-3 pb-3 font-weight-bolder text-danger">{errors}</div>}
       </Modal>
-      { errors
-        ? (
-          <Overlay placement="top" target={inputRef.current} show={show}>
-            <Tooltip>{errors}</Tooltip>
-          </Overlay>
-        ) : null }
     </>
   );
 };

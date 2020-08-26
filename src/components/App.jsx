@@ -7,6 +7,7 @@ import Header from './Header';
 
 const App = () => (
   <>
+    <Modal />
     <div className="d-flex h-100">
       <div className="d-flex flex-column text-white bg-dark w-25">
         <ChannelsBox />
@@ -21,7 +22,6 @@ const App = () => (
         </div>
       </div>
     </div>
-    <Modal />
   </>
 );
 

@@ -16,46 +16,36 @@ import {
 import * as Yup from 'yup';
 import { actions } from '../../slices';
 
-const getChannelsName = ({ channels }) => channels.map(({ name }) => name);
-
-const useSubmit = () => {
-  const dispatch = useDispatch();
-  const { t } = useTranslation();
-
-  return async ({ channelName }, { setSubmitting, resetForm, setFieldError }) => {
-    try {
-      await dispatch(actions.postChannel({ channelName }));
-      resetForm();
-      setSubmitting(false);
-      dispatch(actions.hideModal());
-    } catch (e) {
-      setFieldError('channelName', t('errors.connectionError'));
-      throw e;
-    }
-  };
-};
+const getChannelsNames = ({ channels }) => channels.map(({ name }) => name);
 
 const AddChannel = () => {
   const { t } = useTranslation();
-  const [show, setShowError] = useState(false);
+  const [showTip, setShowTip] = useState(false);
   const dispatch = useDispatch();
   const inputRef = useRef(null);
-  const channelsName = useSelector(getChannelsName);
-
-  const validation = Yup.object({
-    channelName: Yup.string()
-      .matches(/^\S/, t('errors.nospace'))
-      .required(t('errors.required'))
-      .notOneOf(channelsName, t('errors.noUniqChannelName'))
-      .max(20, t('errors.maxSymbol', { length: 20 })),
-  });
+  const channelsName = useSelector(getChannelsNames);
 
   const formik = useFormik({
     initialValues: {
       channelName: '',
     },
-    validationSchema: validation,
-    onSubmit: useSubmit(),
+    validationSchema: Yup.object({
+      channelName: Yup.string()
+        .matches(/^\S/, t('errors.nospace'))
+        .required(t('errors.required'))
+        .notOneOf(channelsName, t('errors.noUniqChannelName'))
+        .max(20, t('errors.maxSymbol', { length: 20 })),
+    }),
+    onSubmit: async ({ channelName }, { setSubmitting, resetForm, setFieldError }) => {
+      const { payload: { error } } = await dispatch(actions.postChannel({ channelName }));
+      if (error) {
+        setFieldError('noValidationErrors', t('errors.connectionError'));
+        return;
+      }
+      resetForm();
+      setSubmitting(false);
+      dispatch(actions.hideModal());
+    },
   });
 
   useEffect(() => {
@@ -66,7 +56,7 @@ const AddChannel = () => {
 
   useEffect(() => {
     if (formik.errors.channelName) {
-      setShowError(true);
+      setShowTip(true);
     }
   }, [formik.errors]);
 
@@ -92,7 +82,7 @@ const AddChannel = () => {
             {
               formik.errors.channelName
               && (
-                <Overlay placement="top" target={inputRef.current} show={show}>
+                <Overlay placement="top" target={inputRef.current} show={showTip}>
                   <Tooltip>{formik.errors.channelName}</Tooltip>
                 </Overlay>
               )
@@ -100,6 +90,7 @@ const AddChannel = () => {
             <Button variant="primary" type="submit" disabled={formik.isSubmitting || !formik.isValid}>
               {t('buttons.apply')}
             </Button>
+            {formik.errors.noValidationErrors && <span className="ml-5 px-3 font-weight-bolder text-danger">{formik.errors.noValidationErrors}</span>}
           </Form>
         </Modal.Body>
       </Modal>

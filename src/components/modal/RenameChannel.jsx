@@ -22,45 +22,37 @@ const getCurrentChannel = ({ channels, currentChannelId }) => (
 
 const getChannelsName = ({ channels }) => channels.map(({ name }) => name);
 
-const useSubmit = (idChannel) => {
-  const dispatch = useDispatch();
-  const { t } = useTranslation();
-
-  return async ({ newChannelName }, { setSubmitting, resetForm, setFieldError }) => {
-    try {
-      await dispatch(actions.patchChannel({ id: idChannel, name: newChannelName }));
-      resetForm();
-      setSubmitting(false);
-      dispatch(actions.hideModal());
-    } catch (e) {
-      setFieldError('newChannelName', t('errors.connectionError'));
-      throw e;
-    }
-  };
-};
-
 const RenameChannel = () => {
   const { t } = useTranslation();
-  const [show, setShow] = useState(false);
+  const [showTip, setShowTip] = useState(false);
   const { id, name } = useSelector(getCurrentChannel);
   const channelsName = useSelector(getChannelsName);
   const dispatch = useDispatch();
   const inputRef = useRef(null);
 
-  const validation = Yup.object({
-    newChannelName: Yup.string()
-      .matches(/^\S/, t('errors.nospace'))
-      .required(t('errors.required'))
-      .notOneOf(channelsName, t('errors.noUniqChannelName'))
-      .max(20, t('errors.maxSymbol', { length: 20 })),
-  });
-
   const formik = useFormik({
     initialValues: {
       newChannelName: name,
     },
-    validationSchema: validation,
-    onSubmit: useSubmit(id),
+    validationSchema: Yup.object({
+      newChannelName: Yup.string()
+        .matches(/^\S/, t('errors.nospace'))
+        .required(t('errors.required'))
+        .notOneOf(channelsName, t('errors.noUniqChannelName'))
+        .max(20, t('errors.maxSymbol', { length: 20 })),
+    }),
+    onSubmit: async ({ newChannelName }, { setSubmitting, resetForm, setFieldError }) => {
+      const { payload: { error } } = await dispatch(
+        actions.updateChannelName({ id, name: newChannelName }),
+      );
+      if (error) {
+        setFieldError('noValidationErrors', t('errors.connectionError'));
+        return;
+      }
+      resetForm();
+      setSubmitting(false);
+      dispatch(actions.hideModal());
+    },
   });
 
   useEffect(() => {
@@ -71,7 +63,7 @@ const RenameChannel = () => {
 
   useEffect(() => {
     if (formik.errors.newChannelName) {
-      setShow(true);
+      setShowTip(true);
     }
   }, [formik.errors]);
 
@@ -97,7 +89,7 @@ const RenameChannel = () => {
             {
               formik.errors.newChannelName
               && (
-                <Overlay placement="top" target={inputRef.current} show={show}>
+                <Overlay placement="top" target={inputRef.current} show={showTip}>
                   <Tooltip>{formik.errors.newChannelName}</Tooltip>
                 </Overlay>
               )
@@ -105,6 +97,10 @@ const RenameChannel = () => {
             <Button variant="primary" type="submit" disabled={formik.isSubmitting || !formik.isValid}>
               {t('buttons.apply')}
             </Button>
+            {
+              formik.errors.noValidationErrors
+              && <span className="ml-5 px-3 font-weight-bolder text-danger">{formik.errors.noValidationErrors}</span>
+            }
           </Form>
         </Modal.Body>
       </Modal>
