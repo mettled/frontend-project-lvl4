@@ -8,8 +8,8 @@ const Message = ({ message }) => {
       <span className="font-weight-bold">
         {`${name} :`}
       </span>
-      <div className="text-info ext-wrap text-break">{ text }</div>
-      <small>
+      <div className="text-wrap text-break">{ text }</div>
+      <small className="text-info">
         {format(new Date(date), 'yy/MMMM/dd HH:mm:ss')}
       </small>
     </div>
