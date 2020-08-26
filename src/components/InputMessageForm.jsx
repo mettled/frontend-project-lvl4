@@ -54,7 +54,7 @@ const InputMessageForm = () => {
     if (inputRef.current) {
       inputRef.current.focus();
     }
-  }, [formik.values.message]);
+  });
 
   useEffect(() => {
     if (formik.errors.message) {
